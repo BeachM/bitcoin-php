@@ -22,17 +22,13 @@ class ExtraPayload extends StaticBufferCollection implements ExtraPayloadInterfa
     {
         $extra_payload = (new ExtraPayloadSerializer())->serialize($this);
 
-        $extra_payload_size = $extra_payload->getSize();
-
-        return $extra_payload_size;
+        return $extra_payload->getSize();
     }
 
     public function getHex(): string
     {
         $extra_payload = (new ExtraPayloadSerializer())->serialize($this);
 
-        $extra_payload_hex = $extra_payload->getHex();
-
-        return $extra_payload_hex;
+        return $extra_payload->getHex();
     }
 }

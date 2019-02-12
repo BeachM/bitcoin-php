@@ -47,12 +47,7 @@ class Transaction extends Serializable implements TransactionInterface
     private $type;
 
     /**
-     * @var int
-     */
-    private $extra_payload_size;
-
-    /**
-     * @var ExtraPayloadInterface // TODO - is this the right way to describe the data type?
+     * @var ExtraPayloadInterface
      */
     private $extra_payload;
 
@@ -75,7 +70,7 @@ class Transaction extends Serializable implements TransactionInterface
      * @param ScriptWitnessInterface[] $vwit
      * @param int $nLockTime
      * @param int $nType
-     * @param ExtraPayloadInterface[] $nExtraPayload
+     * @param ExtraPayloadInterface $nExtraPayload
      */
     public function __construct(
         int $nVersion = TransactionInterface::DEFAULT_VERSION,
@@ -84,7 +79,7 @@ class Transaction extends Serializable implements TransactionInterface
         array $vwit = [],
         int $nLockTime = 0,
         int $nType = TransactionInterface::DEFAULT_TYPE,
-        array $nExtraPayload = null
+        ExtraPayloadInterface $nExtraPayload = null
     ) {
         if ($nVersion < IntRange::I32_MIN || $nVersion > IntRange::I32_MAX) {
             throw new \InvalidArgumentException('Transaction version is outside valid range');
@@ -97,14 +92,9 @@ class Transaction extends Serializable implements TransactionInterface
         $this->version = $nVersion;
         $this->lockTime = $nLockTime;
         $this->type = $nType;
-        $this->extra_payload_size = sizeof($nExtraPayload);
-
-        //$this->extra_payload = $nExtraPayload;
 
         if ($nVersion >= 3 && $nType > 0) {
-            $this->extra_payload = array_map(function (ExtraPayloadInterface $payload) {
-               return $payload;
-            }, $nExtraPayload);
+            $this->extra_payload = $nExtraPayload;
         }
 
         $this->inputs = array_map(function (TransactionInputInterface $input) {
@@ -166,9 +156,9 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return ExtraPayloadInterface[]
+     * @return ExtraPayloadInterface
      */
-    public function getExtraPayload(): array
+    public function getExtraPayload(): ExtraPayloadInterface
     {
         return $this->extra_payload;
     }

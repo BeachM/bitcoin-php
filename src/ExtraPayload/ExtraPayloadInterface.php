@@ -11,18 +11,18 @@ use BitWasp\Buffertools\SerializableInterface;
 interface ExtraPayloadInterface extends CollectionInterface, SerializableInterface
 {
     /**
-     * @return BufferInterface[]
+     * @return BufferInterface
      */
     public function getBuffer(): BufferInterface;
 
     /**
-     * @param ScriptWitnessInterface $witness
+     * @param ExtraPayloadInterface $extra_payload_size
      * @return int
      */
     public function getSize(): int;
 
     /**
-     * @param ScriptWitnessInterface $witness
+     * @param ExtraPayloadInterface $extra_payload_hex
      * @return int
      */
     public function getHex(): string;

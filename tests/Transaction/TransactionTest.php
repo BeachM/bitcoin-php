@@ -102,16 +102,14 @@ class TransactionTest extends AbstractTestCase
 
         $tx = TransactionFactory::fromHex($hex);
 
-        $temp = $tx->getExtraPayload(); // TODO - remove unnecessary array stuff
-
         $this->assertInstanceOf(Transaction::class, $tx);
         $this->assertEquals(3, $tx->getVersion());
         $this->assertEquals(0, $tx->getLockTime());
         $this->assertEquals(1, count($tx->getInputs()));
         $this->assertEquals(1, count($tx->getOutputs()));
         $this->assertEquals(1, $tx->getType());
-        $this->assertEquals(274, $temp[0]->getSize());
-        $this->assertEquals($extra_payload, $temp[0]->getHex());
+        $this->assertEquals(274, $tx->getExtraPayload()->getSize());
+        $this->assertEquals($extra_payload, $tx->getExtraPayload()->getHex());
 
         $serialized = $tx->getBuffer()->getHex();
         $this->assertSame($hex, $serialized);

@@ -14,31 +14,13 @@ use BitWasp\Buffertools\Parser;
 class ExtraPayloadSerializer
 {
     /**
-     * @var \BitWasp\Buffertools\Types\VarString
-     */
-    private $varstring;
-
-    /**
      * @var \BitWasp\Buffertools\Types\VarInt
      */
     private $varint;
 
-    /**
-     * @var \BitWasp\Buffertools\Types\Int8
-     */
-    protected $int8le;
-
-    /**
-     * @var \BitWasp\Buffertools\Types\Uint8
-     */
-    protected $uint8le;
-
     public function __construct()
     {
-        $this->varstring = Types::varstring();
         $this->varint = Types::varint();
-        $this->int32le = Types::int8le();
-        $this->uint32le = Types::uint8le();
     }
 
     /**
@@ -60,7 +42,7 @@ class ExtraPayloadSerializer
 
     /**
      * @param ExtraPayloadInterface $extra_payload
-     * @return BufferInterface
+     * @return ExtraPayload
      */
     public function serialize(ExtraPayloadInterface $extra_payload): BufferInterface
     {

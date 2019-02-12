@@ -161,22 +161,7 @@ class TransactionSerializer implements TransactionSerializerInterface
         $extra_payload = null;
 
         if ($version >= 3 && $type != 0) {
-            /*
-            $extra_payload = [];
-
-            $extra_payload_size = (int) $this->varint->read($parser);
-            for ($i = 0; $i < $extra_payload_size; $i++) {
-                // $extra_payload[] = (int) $this->uint8le->read($parser);
-            }
-            */
-
-            // $payloadSerializer = new ExtraPayloadSerializer();
-
-            $extra_payload[] = $this->payloadSerializer->fromParser($parser);
-
-            $temp = $extra_payload[0];
-
-            // var_dump($temp);
+            $extra_payload = $this->payloadSerializer->fromParser($parser);
         }
 
         return new Transaction($version, $vin, $vout, $vwit, $lockTime, $type, $extra_payload);
@@ -237,8 +222,8 @@ class TransactionSerializer implements TransactionSerializerInterface
 
             $extraPayload = $transaction->getExtraPayload();
 
-            $extra_payload_size = $extraPayload[0]->getSize();
-            $extra_payload = $extraPayload[0]->getBuffer();
+            $extra_payload_size = $extraPayload->getSize();
+            $extra_payload = $extraPayload->getBuffer();
 
             if ($extra_payload_size >= 0) {
 
