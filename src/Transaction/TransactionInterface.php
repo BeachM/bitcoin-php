@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
+use BitWasp\Bitcoin\ExtraPayload\ExtraPayloadInterface;
 use BitWasp\Bitcoin\SerializableInterface;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\BufferInterface;
@@ -12,6 +13,7 @@ use BitWasp\Buffertools\BufferInterface;
 interface TransactionInterface extends SerializableInterface
 {
     const DEFAULT_VERSION = 1;
+    const DEFAULT_TYPE = 0;
 
     /**
      * The locktime parameter is encoded as a uint32
@@ -48,6 +50,13 @@ interface TransactionInterface extends SerializableInterface
      * @return int
      */
     public function getVersion(): int;
+
+    /**
+     * Get the type of this transaction
+     *
+     * @return int
+     */
+    public function getType(): int;
 
     /**
      * Return an array of all inputs

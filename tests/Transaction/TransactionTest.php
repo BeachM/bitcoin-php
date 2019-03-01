@@ -207,4 +207,136 @@ class TransactionTest extends AbstractTestCase
         $this->assertEquals($raw, $tx->getHex());
         $this->assertEquals($txId, $tx->getTxId()->getHex());
     }
+    
+    public function testFromHex_dash_v3_type1()
+    {
+        $hex = '030001000126d3cb36b5360a23f5f4a2ea4c98d385c0c7a80788439f52a237717d799356a6000000006b483045022100b025cd823cf6b746e97a1e5657c1c6f150bc63530734b1c5dacef2cfad53a8ea022073d0801e18a082eaee70838f2cfc19c78b88b879af7d3e42023d61852ad289e701210222865251150a58f0f89602cb812046cc38c84d67e3dc74edb9061aaed19c2bdefeffffff0143c94fbb000000001976a9145cbfea4a74cfeb5f801f2cbaf38a9bac7ebebb0e88ac00000000fd120101000000000026d3cb36b5360a23f5f4a2ea4c98d385c0c7a80788439f52a237717d799356a60100000000000000000000000000ffffc38d008f4e1f8a94fb062049b841f716dcded8257a3632fb053c8273ec203d1ea62cbdb54e10618329e4ed93e99bc9c5ab2f4cb0055ad281f9ad0808a1dda6aedf12c41c53142828879b8a94fb062049b841f716dcded8257a3632fb053c00001976a914e4876df5735eaa10a761dca8d62a7a275349022188acbc1055e0331ea0ea63caf80e0a7f417e50df6469a97db1f4f1d81990316a5e0b412045323bca7defef188065a6b30fb3057e4978b4f914e4e8cc0324098ae60ff825693095b927cd9707fe10edbf8ef901fcbc63eb9a0e7cd6fed39d50a8cde1cdb4';
+        $extra_payload = '01000000000026d3cb36b5360a23f5f4a2ea4c98d385c0c7a80788439f52a237717d799356a60100000000000000000000000000ffffc38d008f4e1f8a94fb062049b841f716dcded8257a3632fb053c8273ec203d1ea62cbdb54e10618329e4ed93e99bc9c5ab2f4cb0055ad281f9ad0808a1dda6aedf12c41c53142828879b8a94fb062049b841f716dcded8257a3632fb053c00001976a914e4876df5735eaa10a761dca8d62a7a275349022188acbc1055e0331ea0ea63caf80e0a7f417e50df6469a97db1f4f1d81990316a5e0b412045323bca7defef188065a6b30fb3057e4978b4f914e4e8cc0324098ae60ff825693095b927cd9707fe10edbf8ef901fcbc63eb9a0e7cd6fed39d50a8cde1cdb4';
+
+        $tx = TransactionFactory::fromHex($hex);
+
+        $this->assertInstanceOf(Transaction::class, $tx);
+        $this->assertEquals(3, $tx->getVersion());
+        $this->assertEquals(0, $tx->getLockTime());
+        $this->assertEquals(1, count($tx->getInputs()));
+        $this->assertEquals(1, count($tx->getOutputs()));
+        $this->assertEquals(1, $tx->getType());
+        $this->assertEquals(274, $tx->getExtraPayload()->getSize());
+        $this->assertEquals($extra_payload, $tx->getExtraPayload()->getHex());
+
+        $serialized = $tx->getBuffer()->getHex();
+        $this->assertSame($hex, $serialized);
+
+        $this->assertEquals('62330c04f20acc541c8d4f3022ba2b032ea5530c476e61dc9c4235ac20d10f4f', $tx->getTxId()->getHex());
+    }
+
+    public function testFromHex_dash_v3_type2()
+    {
+        $hex = '03000200017b1100a3e33b86b1e9948a1091648b44ac2e819850e321bbbbd9a7825cf173c8000000006a473044022028f2ca816270068494686ed25ff64590c3a04f0b730d7e52e751adf640a9e4de02200379a4757738e83c24d25988c6cb4aed39120c985347a13e35401da41458ee0e012103a306d65010b0cb287de227a22b978973a0902174fe8bec61519d91183c97d9a1feffffff01e5f5b47f000000001976a914b45868066caf1c974bd7d0fb42c896cecdeccc9588ac00000000ce01007b1100a3e33b86b1e9948a1091648b44ac2e819850e321bbbbd9a7825cf173c800000000000000000000ffffc38d8f314e1f1976a9143e1f214c329557ae3711cb173bcf04d00762f3ff88ac3f7685789f3e6480ba6ed402285da0ed9cd0558265603fa8bad0eec0572cf1eb1746f9c46d654879d9afd67a439d4bc2ef7c1b26de2e59897fa83242d9bd819ff46c71d9e3d7aa1772f4003349b777140bedebded0a42efd64baf34f59c4a79c128df711c10a45505a0c2a94a5908f1642cbb56730f16b2cc2419a45890fb8ff';
+        $extra_payload = '01007b1100a3e33b86b1e9948a1091648b44ac2e819850e321bbbbd9a7825cf173c800000000000000000000ffffc38d8f314e1f1976a9143e1f214c329557ae3711cb173bcf04d00762f3ff88ac3f7685789f3e6480ba6ed402285da0ed9cd0558265603fa8bad0eec0572cf1eb1746f9c46d654879d9afd67a439d4bc2ef7c1b26de2e59897fa83242d9bd819ff46c71d9e3d7aa1772f4003349b777140bedebded0a42efd64baf34f59c4a79c128df711c10a45505a0c2a94a5908f1642cbb56730f16b2cc2419a45890fb8ff';
+
+        $tx = TransactionFactory::fromHex($hex);
+
+        $this->assertInstanceOf(Transaction::class, $tx);
+        $this->assertEquals(3, $tx->getVersion());
+        $this->assertEquals(0, $tx->getLockTime());
+        $this->assertEquals(1, count($tx->getInputs()));
+        $this->assertEquals(1, count($tx->getOutputs()));
+        $this->assertEquals(2, $tx->getType());
+        $this->assertEquals(206, $tx->getExtraPayload()->getSize());
+        $this->assertEquals($extra_payload, $tx->getExtraPayload()->getHex());
+
+        $serialized = $tx->getBuffer()->getHex();
+        $this->assertSame($hex, $serialized);
+
+        $this->assertEquals('8bbba69857ce67e93a580cb32ff4fa3b8be3f7101fec7bd5d736eb4466305094', $tx->getTxId()->getHex());
+    }
+
+    public function testFromHex_dash_v3_type3()
+    {
+        $hex = '03000300014f0fd120ac35429cdc616e470c53a52e032bba22304f8d1c54cc0af2040c3362000000006b483045022100dd412692cfc23f6b4e8853e5db29f314d9d309c4c6caa4be8bd325f74def1ad4022038eda085b8e13420e4d849e218307c97bf0873819d52968325e8f17500d534580121025f4156984bd7f24c63e63caae7b3e3ae0afb008258b9446bdc97fbd3316de3f5feffffff0194c74fbb000000001976a9140b6def979ca5d7ae8b7319d421736cab851dc7de88ac00000000e401004f0fd120ac35429cdc616e470c53a52e032bba22304f8d1c54cc0af2040c3362000018ece819b998a36a185e323a8749e55fd3dc2e259b741f8580fbd68cbd9f51d30f4d4da34fd5afc71859dca3cf10fbda8a94fb062049b841f716dcded8257a3632fb053c1976a914f25c59be48ee1c4fd3733ecf56f440659f1d6c5088acb309a51267451a7f52e79ef2391aa952e9a0284e8fd8db56cdcae3b49b7e6dab4120c838c08b9492c5039444cac11e466df3609c585010fab636de75c687bab9f6154d9a7c26d7b5384a147fc67ddb2e66e5f773af73dbf818109aec692ed364eafd';
+        $extra_payload = '01004f0fd120ac35429cdc616e470c53a52e032bba22304f8d1c54cc0af2040c3362000018ece819b998a36a185e323a8749e55fd3dc2e259b741f8580fbd68cbd9f51d30f4d4da34fd5afc71859dca3cf10fbda8a94fb062049b841f716dcded8257a3632fb053c1976a914f25c59be48ee1c4fd3733ecf56f440659f1d6c5088acb309a51267451a7f52e79ef2391aa952e9a0284e8fd8db56cdcae3b49b7e6dab4120c838c08b9492c5039444cac11e466df3609c585010fab636de75c687bab9f6154d9a7c26d7b5384a147fc67ddb2e66e5f773af73dbf818109aec692ed364eafd';
+
+        $tx = TransactionFactory::fromHex($hex);
+
+        $this->assertInstanceOf(Transaction::class, $tx);
+        $this->assertEquals(3, $tx->getVersion());
+        $this->assertEquals(0, $tx->getLockTime());
+        $this->assertEquals(1, count($tx->getInputs()));
+        $this->assertEquals(1, count($tx->getOutputs()));
+        $this->assertEquals(3, $tx->getType());
+        $this->assertEquals(228, $tx->getExtraPayload()->getSize());
+        $this->assertEquals($extra_payload, $tx->getExtraPayload()->getHex());
+
+        $serialized = $tx->getBuffer()->getHex();
+        $this->assertSame($hex, $serialized);
+
+        $this->assertEquals('337456ea0f912f9c2e91bdadd1cd208e77ee8a7e5d6a9a491b13fa94a40b5d97', $tx->getTxId()->getHex());
+    }
+
+    public function testFromHex_dash_v3_type4()
+    {
+        $hex = '03000400016f8a813df204873df003d6efc44e1906eaf6180a762513b1c91252826ce05916000000006b4830450221009b50474beacd48b37340eb5715a5ebd92239e54595147b5c55018bc29f26bde302203f312cdd8009f3f03b9bb9a00074361974a40f5f5fafaf16ba4378cb72adcc4201210250a5b41488dec3d4116ae5733d18d03326050aebc3958118d647739ad1a5de24feffffff01b974ed6d000000001976a914f0ae84a7ea8a0efd48c155eeeaaed6eb64c2812188ac00000000a401006f8a813df204873df003d6efc44e1906eaf6180a762513b1c91252826ce05916010082cf248cf6b8ac6a3cdc826edae582ead20421659ed891f9d4953a540616fb4f05279584b3339ed2ba95711ad28b18ee2878c4a904f76ea4d103e1d739f22ff7e3b9b3db7d0c4a7e120abb4952c3574a18de34fa29828f9fe3f52bd0b1fac17acd04f7751967d782045ab655053653438f1dd1e14ba6adeb8351b78c9eb59bf4';
+        $extra_payload = '01006f8a813df204873df003d6efc44e1906eaf6180a762513b1c91252826ce05916010082cf248cf6b8ac6a3cdc826edae582ead20421659ed891f9d4953a540616fb4f05279584b3339ed2ba95711ad28b18ee2878c4a904f76ea4d103e1d739f22ff7e3b9b3db7d0c4a7e120abb4952c3574a18de34fa29828f9fe3f52bd0b1fac17acd04f7751967d782045ab655053653438f1dd1e14ba6adeb8351b78c9eb59bf4';
+
+        $tx = TransactionFactory::fromHex($hex);
+
+        $this->assertInstanceOf(Transaction::class, $tx);
+        $this->assertEquals(3, $tx->getVersion());
+        $this->assertEquals(0, $tx->getLockTime());
+        $this->assertEquals(1, count($tx->getInputs()));
+        $this->assertEquals(1, count($tx->getOutputs()));
+        $this->assertEquals(4, $tx->getType());
+        $this->assertEquals(164, $tx->getExtraPayload()->getSize());
+        $this->assertEquals($extra_payload, $tx->getExtraPayload()->getHex());
+
+        $serialized = $tx->getBuffer()->getHex();
+        $this->assertSame($hex, $serialized);
+
+        $this->assertEquals('6926d964bccfd4418e373f08cf41d3302f9616ee5d9bc40b18aa99fc18a3d4ea', $tx->getTxId()->getHex());
+    }
+
+    public function testFromHex_dash_v3_type5()
+    {
+        $hex = '03000500010000000000000000000000000000000000000000000000000000000000000000ffffffff12027d1b0e2f5032506f6f6c2d74444153482fffffffff0403155b96010000001976a9144f79c383bc5d3e9d4d81b98f87337cedfa78953688ac40c3609a010000001976a914255c0d7c93c12c801140d4e3287d2f40d4ff42dd88ac3dae0504000000001976a914badadfdebaa6d015a0299f23fbc1fcbdd72ba96f88ac00000000000000002a6a2883bdbfb92d3848bca649767bf4f1f2994a66026a938d896348664703e730bbce0000000001000000000000002601007d1b00000000000000000000000000000000000000000000000000000000000000000000';
+        $extra_payload = '01007d1b00000000000000000000000000000000000000000000000000000000000000000000';
+
+        $tx = TransactionFactory::fromHex($hex);
+
+        $this->assertInstanceOf(Transaction::class, $tx);
+        $this->assertEquals(3, $tx->getVersion());
+        $this->assertEquals(0, $tx->getLockTime());
+        $this->assertEquals(1, count($tx->getInputs()));
+        $this->assertEquals(4, count($tx->getOutputs()));
+        $this->assertEquals(5, $tx->getType());
+        $this->assertEquals(38, $tx->getExtraPayload()->getSize());
+        $this->assertEquals($extra_payload, $tx->getExtraPayload()->getHex());
+
+        $serialized = $tx->getBuffer()->getHex();
+        $this->assertSame($hex, $serialized);
+
+        $this->assertEquals('13c97f347a78eb3c200e224d074207043e419feef46a447b4065add9da90068d', $tx->getTxId()->getHex());
+    }
+
+    public function testFromHex_dash_v3_type6()
+    {
+        $hex = '03000600000000000000fd49010100c9a4000001000188ede9b2bc7e3c1e90b23bccee486bc68a15011a680d114a47231a0000000000320000000000000032000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000';
+        $extra_payload = '0100c9a4000001000188ede9b2bc7e3c1e90b23bccee486bc68a15011a680d114a47231a0000000000320000000000000032000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000';
+
+        $tx = TransactionFactory::fromHex($hex);
+
+        $this->assertInstanceOf(Transaction::class, $tx);
+        $this->assertEquals(3, $tx->getVersion());
+        $this->assertEquals(0, $tx->getLockTime());
+        $this->assertEquals(0, count($tx->getInputs()));
+        $this->assertEquals(0, count($tx->getOutputs()));
+        $this->assertEquals(6, $tx->getType());
+        $this->assertEquals(329, $tx->getExtraPayload()->getSize());
+        $this->assertEquals($extra_payload, $tx->getExtraPayload()->getHex());
+
+        $serialized = $tx->getBuffer()->getHex();
+        $this->assertSame($hex, $serialized);
+
+        $this->assertEquals('fb252a5e9b126e4613423c18bf8087dab706dda4bd3cb58ff5c6ba1adbd33000', $tx->getTxId()->getHex());
+    }
 }

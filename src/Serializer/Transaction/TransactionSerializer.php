@@ -6,6 +6,7 @@ namespace BitWasp\Bitcoin\Serializer\Transaction;
 
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Serializer\Script\ScriptWitnessSerializer;
+use BitWasp\Bitcoin\Serializer\ExtraPayload\ExtraPayloadSerializer;
 use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -15,6 +16,16 @@ use BitWasp\Buffertools\Parser;
 class TransactionSerializer implements TransactionSerializerInterface
 {
     const NO_WITNESS = 1;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\Int16
+     */
+    protected $int16le;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\Uint16
+     */
+    protected $uint16le;
 
     /**
      * @var \BitWasp\Buffertools\Types\Int32
@@ -46,8 +57,15 @@ class TransactionSerializer implements TransactionSerializerInterface
      */
     protected $witnessSerializer;
 
-    public function __construct(TransactionInputSerializer $inputSerializer = null, TransactionOutputSerializer $outputSerializer = null, ScriptWitnessSerializer $witnessSerializer = null)
+    /**
+     * @var ExtraPayloadSerializer
+     */
+    protected $payloadSerializer;
+
+    public function __construct(TransactionInputSerializer $inputSerializer = null, TransactionOutputSerializer $outputSerializer = null, ScriptWitnessSerializer $witnessSerializer = null, ExtraPayloadSerializer $payloadSerializer = null)
     {
+        $this->int16le = Types::int16le();
+        $this->uint16le = Types::uint16le();
         $this->int32le = Types::int32le();
         $this->uint32le = Types::uint32le();
         $this->varint = Types::varint();
@@ -66,9 +84,14 @@ class TransactionSerializer implements TransactionSerializerInterface
             $witnessSerializer = new ScriptWitnessSerializer();
         }
 
+        if (!$payloadSerializer) {
+            $payloadSerializer = new ExtraPayloadSerializer();
+        }
+
         $this->inputSerializer = $inputSerializer;
         $this->outputSerializer = $outputSerializer;
         $this->witnessSerializer = $witnessSerializer;
+        $this->payloadSerializer = $payloadSerializer;
     }
 
     /**
@@ -77,7 +100,8 @@ class TransactionSerializer implements TransactionSerializerInterface
      */
     public function fromParser(Parser $parser): TransactionInterface
     {
-        $version = (int) $this->int32le->read($parser);
+        $version = (int) $this->uint16le->read($parser);
+        $type = (int) $this->uint16le->read($parser);
 
         $vin = [];
         $vinCount = $this->varint->read($parser);
@@ -122,7 +146,13 @@ class TransactionSerializer implements TransactionSerializerInterface
 
         $lockTime = (int) $this->uint32le->read($parser);
 
-        return new Transaction($version, $vin, $vout, $vwit, $lockTime);
+        $extra_payload = null;
+
+        if ($version >= 3 && $type != 0) {
+            $extra_payload = $this->payloadSerializer->fromParser($parser);
+        }
+
+        return new Transaction($version, $vin, $vout, $vwit, $lockTime, $type, $extra_payload);
     }
 
     /**
@@ -141,8 +171,12 @@ class TransactionSerializer implements TransactionSerializerInterface
      */
     public function serialize(TransactionInterface $transaction, int $opt = 0): BufferInterface
     {
+        $version = $transaction->getVersion();
+        $type = $transaction->getType();
+
         $parser = new Parser();
-        $parser->appendBinary($this->int32le->write($transaction->getVersion()));
+        $parser->appendBinary($this->int16le->write($version));
+        $parser->appendBinary($this->int16le->write($type));
 
         $flags = 0;
         $allowWitness = !($opt & self::NO_WITNESS);
@@ -171,6 +205,21 @@ class TransactionSerializer implements TransactionSerializerInterface
         }
 
         $parser->appendBinary($this->uint32le->write($transaction->getLockTime()));
+
+        if ($version >= 3 && $type != 0) {
+
+            $extraPayload = $transaction->getExtraPayload();
+
+            $extra_payload_size = $extraPayload->getSize();
+            $extra_payload = $extraPayload->getBuffer();
+
+            if ($extra_payload_size >= 0) {
+
+                $parser->appendBinary($this->varint->write($extra_payload_size));
+                $parser->appendBuffer($extra_payload);
+
+            }
+        }
 
         return $parser->getBuffer();
     }
